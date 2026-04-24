@@ -7,9 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#1a365d',
-        secondary: '#2d3748',
-        accent: '#3182ce',
+        primary: '#0f172a',
+        secondary: '#334155',
+        accent: '#059669',
       },
       fontFamily: {
         serif: ['"Playfair Display"', 'serif'],
