@@ -1,6 +1,6 @@
 import './style.css';
-import { createClient } from '@supabase/supabase-js';
 import { initialArticles, initialIssues, initialSiteInfo, initialAnnouncements, editorialTeam } from './data.js';
+import { createClient } from '@supabase/supabase-js';
 
 // --- Supabase Config ---
 const supabaseUrl = 'https://lmhqneinkzpxfhahvcvx.supabase.co';
@@ -42,7 +42,6 @@ async function loadData() {
 const saveState = async (table, data) => {
   try {
     if (table && data) {
-      // PostgreSQL uchun nomlarni moslash (camelCase -> snake_case)
       const dbData = { ...data };
       if (table === 'issues') {
         if (data.issueNumber) { dbData.issuenumber = data.issueNumber; delete dbData.issueNumber; }
@@ -111,7 +110,7 @@ function updateMetaTags(article) {
     { name: 'citation_firstpage', content: article.firstPage || '1' },
     { name: 'citation_lastpage', content: article.lastPage || '10' },
     { name: 'citation_abstract_html_url', content: window.location.href },
-    { name: 'citation_pdf_url', content: article.pdfPath },
+    { name: 'citation_pdf_url', content: window.location.origin + '/' + article.pdfPath },
     { name: 'citation_language', content: 'en' }
   );
 
@@ -294,7 +293,7 @@ function renderPublic(path, params) {
                
                <div class="mt-8 flex justify-center gap-4">
                   <button onclick="window.togglePdfViewer()" class="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-800 transition-all flex items-center gap-2">👁️ View PDF</button>
-                  <a href="${art.pdfPath}" download class="bg-slate-100 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all flex items-center gap-2">📥 Download</a>
+                  <a href="/${art.pdfPath}" download class="bg-slate-100 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all flex items-center gap-2">📥 Download</a>
                   <button onclick="window.copyCitation()" class="bg-white border border-slate-200 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">📋 Cite Article</button>
                </div>
              </header>
@@ -351,7 +350,7 @@ function renderPublic(path, params) {
                    <div class="text-[10px] font-black uppercase tracking-widest text-accent">${siteInfo.shortName} Reader</div>
                 </div>
                 <div class="flex-1">
-                   <iframe src="${art.pdfPath}" class="w-full h-full border-none" title="PDF Document Viewer"></iframe>
+                   <iframe src="/${art.pdfPath}" class="w-full h-full border-none" title="PDF Document Viewer"></iframe>
                 </div>
              </div>
           </article>
@@ -679,7 +678,7 @@ function attachSubmissionEvent() {
         status: 'Pending',
         date: new Date().toLocaleDateString()
       };
-      submissions.unshift({ ...newSub, filePath: newSub.file_path });
+      submissions.unshift({ ...newSub, filePath: newSub.file_path }); 
       const success = await saveState('submissions', newSub);
       if (success) {
         alert('Your manuscript has been successfully submitted. The editorial team will contact you soon.');
@@ -687,7 +686,7 @@ function attachSubmissionEvent() {
       }
     } catch (err) {
       console.error('Submission Error:', err);
-      alert('Submission failed: ' + err.message);
+      alert('Submission failed. Please check if the server is running.');
     } finally {
       btn.disabled = false;
       btn.innerHTML = originalBtnText;
@@ -797,7 +796,7 @@ function renderAdminContent(path, params) {
                <pre class="text-xs bg-slate-50 p-4 rounded-xl whitespace-pre-wrap font-sans text-slate-500 border border-slate-100">${sub.references || 'Noma\'lum'}</pre>
             </div>
             <div class="flex gap-4 pt-6">
-               <a href="${sub.file_path}" target="_blank" class="btn-primary flex-1 text-center py-4 flex items-center justify-center gap-2">📥 Faylni ko'rish</a>
+               <a href="/${sub.filePath}" download class="btn-primary flex-1 text-center py-4 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all">📥 Faylni yuklab olish</a>
                <button onclick="window.deleteSubmission('${sub.id}')" class="bg-red-50 text-red-500 px-6 py-4 rounded-xl font-bold border border-red-100 hover:bg-red-500 hover:text-white transition-all active:scale-95 flex items-center gap-2">🗑️ Arizani o'chirish</button>
             </div>
          </div>
@@ -809,7 +808,7 @@ function renderAdminContent(path, params) {
           <button onclick="window.msje_navigate('/admin/submissions?view=${sub.id}')" class="inline-flex items-center gap-1.5 text-accent hover:text-white border border-accent/20 hover:bg-accent px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all hover:scale-105 active:scale-95">
              👁️ Ko'rish
           </button>
-          <a href="${sub.file_path}" target="_blank" class="inline-flex items-center gap-1.5 text-blue-600 hover:text-white border border-blue-100 hover:bg-blue-600 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all hover:scale-105 active:scale-95 ml-2">
+          <a href="/${sub.filePath}" download class="inline-flex items-center gap-1.5 text-blue-600 hover:text-white border border-blue-100 hover:bg-blue-600 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all hover:scale-105 active:scale-95 ml-2">
              📥 Fayl
           </a>
           <button onclick="window.deleteSubmission('${sub.id}')" class="inline-flex items-center gap-1.5 text-red-500 hover:text-white border border-red-100 hover:bg-red-500 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all hover:scale-105 active:scale-95 ml-2">
@@ -948,6 +947,7 @@ function renderAdminContent(path, params) {
 }
 
 function attachAdminEvents(path, params) {
+  // ... Forms (Settings, Issue, Article, Announcement) logic
   const setForm = document.getElementById('settings-form');
   if (setForm) {
     setForm.onsubmit = async (e) => {
@@ -956,11 +956,12 @@ function attachAdminEvents(path, params) {
       siteInfo.shortName = document.getElementById('s-short').value;
       siteInfo.issn = document.getElementById('s-issn').value;
       siteInfo.email = document.getElementById('s-email').value;
-      const dbData = {
-        id: 'settings',
-        name: siteInfo.name,
-        short_name: siteInfo.shortName,
-        issn: siteInfo.issn,
+      
+      const dbData = { 
+        id: 'site-info', 
+        name: siteInfo.name, 
+        short_name: siteInfo.shortName, 
+        issn: siteInfo.issn, 
         email: siteInfo.email,
         description: siteInfo.description,
         address: siteInfo.address,
@@ -1015,13 +1016,19 @@ function attachAdminEvents(path, params) {
       e.preventDefault();
       const btn = e.target.querySelector('button[type="submit"]');
       const originalBtnText = btn.innerHTML;
+      
+      // Loading effekti boshlanishi
       btn.disabled = true;
-      btn.innerHTML = `<span class="flex items-center justify-center gap-3"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Fayl yuklanmoqda...</span>`;
+      btn.innerHTML = `<span class="flex items-center justify-center gap-3">
+        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        Fayl yuklanmoqda...
+      </span>`;
 
       try {
         const id = document.getElementById('a-id').value;
         const art = articles.find(a => a.id === id) || {};
         let pdfPath = art.pdfPath || 'uploads/sample.pdf';
+        
         const fileInput = document.getElementById('a-pdf');
         const file = fileInput.files[0];
         if (file) {
@@ -1039,6 +1046,7 @@ function attachAdminEvents(path, params) {
         }));
 
         const refList = document.getElementById('a-refs').value.split('\n').filter(r => r.trim() !== '');
+        
         const data = { 
           id: id || 'art-' + Date.now(), 
           title: document.getElementById('a-title').value, 
@@ -1055,8 +1063,11 @@ function attachAdminEvents(path, params) {
           pdf_path: pdfPath 
         };
 
-        if (id) articles = articles.map(a => a.id === id ? { ...data, issueId: data.issue_id, firstPage: data.first_page, lastPage: data.last_page, publicationDate: data.publication_date, pdfPath: data.pdf_path } : a);
-        else articles.unshift({ ...data, issueId: data.issue_id, firstPage: data.first_page, lastPage: data.last_page, publicationDate: data.publication_date, pdfPath: data.pdf_path });
+        if (id) {
+          articles = articles.map(a => a.id === id ? { ...data, issueId: data.issue_id, firstPage: data.first_page, lastPage: data.last_page, publicationDate: data.publication_date, pdfPath: data.pdf_path, references: data.references } : a);
+        } else {
+          articles.unshift({ ...data, issueId: data.issue_id, firstPage: data.first_page, lastPage: data.last_page, publicationDate: data.publication_date, pdfPath: data.pdf_path, references: data.references });
+        }
 
         const success = await saveState('articles', data);
         if (success) {
@@ -1065,9 +1076,10 @@ function attachAdminEvents(path, params) {
         }
       } catch (err) {
         console.error('Save error:', err);
-        alert('Saqlashda xatolik yuz berdi: ' + err.message);
+        alert('Saqlashda xatolik yuz berdi. Server yoniqligini tekshiring.');
       } finally {
-        btn.disabled = false; btn.innerHTML = originalBtnText;
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
       }
     };
   }

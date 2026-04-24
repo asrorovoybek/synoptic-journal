@@ -26,7 +26,8 @@ body {
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 font-sans antialiased;
+    @apply text-slate-100 font-sans antialiased;
+    background: transparent;
   }
 }
 
