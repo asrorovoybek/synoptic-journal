@@ -6,22 +6,13 @@ const supabaseUrl = 'https://lmhqneinkzpxfhahvcvx.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtaHFuZWlua3pweGZoYWh2Y3Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNDY2NDMsImV4cCI6MjA5MjYyMjY0M30.gF5LkfzuDFywZ7iFJh5kEqwaCpu91ixrIHPBa_YxxL4';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+import { initialArticles, initialIssues, initialSiteInfo, initialAnnouncements } from './data.js';
+
 // --- State ---
-let siteInfo = { 
-  name: 'Synoptic: International Journal of Multidisciplinary Research', 
-  short_name: 'Synoptic', 
-  issn: '2994-9580', 
-  tagline: 'International Journal for advanced multi-disciplinary scientific research and development.',
-  description: 'Synoptic is a premier open-access journal dedicated to publishing high-quality research across various fields of science, technology, and humanities.',
-  email: 'info@synoptic.uz',
-  phone: '+998 90 123 45 67',
-  address: 'Tashkent, Uzbekistan',
-  submission_info: 'Manuscripts should be submitted in English, in Microsoft Word format. All submissions undergo a double-blind peer review process.',
-  deadline: 'Next Issue: May 2026'
-};
-let announcements = [];
-let issues = [];
-let articles = [];
+let siteInfo = initialSiteInfo;
+let announcements = initialAnnouncements;
+let issues = initialIssues;
+let articles = initialArticles;
 let submissions = [];
 let isAdminLoggedIn = localStorage.getItem('msje_admin_auth') === 'true';
 
@@ -47,9 +38,9 @@ async function loadData() {
     const { data: sub } = await supabase.from('submissions').select('*').order('created_at', { ascending: false });
 
     if (sInfo) siteInfo = sInfo;
-    if (ann) announcements = ann;
-    if (iss) issues = iss;
-    if (art) articles = art;
+    if (ann && ann.length > 0) announcements = ann;
+    if (iss && iss.length > 0) issues = iss;
+    if (art && art.length > 0) articles = art;
     if (sub) submissions = sub;
 
     handleRoute();
