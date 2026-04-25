@@ -62,7 +62,13 @@ async function loadData() {
         references: a.refs || a.references 
       };
     });
-    if (sub) submissions = sub.map(s => ({ ...s, filePath: s.file_path }));
+    if (sub) submissions = sub.map(s => {
+      let path = s.file_path || s.filePath;
+      if (path && !path.startsWith('http')) {
+        path = `${supabaseUrl}/storage/v1/object/public/pdfs/${path}`;
+      }
+      return { ...s, filePath: path };
+    });
     
     console.log('Sync complete. Articles loaded:', articles.length);
   } catch (e) { 
@@ -328,7 +334,7 @@ function renderPublic(path, params) {
                
                <div class="mt-8 flex justify-center gap-4">
                   <button onclick="window.togglePdfViewer()" class="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-800 transition-all flex items-center gap-2">👁️ View PDF</button>
-                  <a href="/${art.pdfPath}" download class="bg-slate-100 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all flex items-center gap-2">📥 Download</a>
+                  <a href="${art.pdfPath}" download class="bg-slate-100 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all flex items-center gap-2">📥 Download</a>
                   <button onclick="window.copyCitation()" class="bg-white border border-slate-200 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">📋 Cite Article</button>
                </div>
              </header>
@@ -385,7 +391,7 @@ function renderPublic(path, params) {
                    <div class="text-[10px] font-black uppercase tracking-widest text-accent">${siteInfo.shortName} Reader</div>
                 </div>
                 <div class="flex-1">
-                   <iframe src="/${art.pdfPath}" class="w-full h-full border-none" title="PDF Document Viewer"></iframe>
+                   <iframe src="${art.pdfPath}" class="w-full h-full border-none" title="PDF Document Viewer"></iframe>
                 </div>
              </div>
           </article>
@@ -834,7 +840,7 @@ function renderAdminContent(path, params) {
                <pre class="text-xs bg-slate-50 p-4 rounded-xl whitespace-pre-wrap font-sans text-slate-500 border border-slate-100">${sub.references || 'Noma\'lum'}</pre>
             </div>
             <div class="flex gap-4 pt-6">
-               <a href="/${sub.filePath}" download class="btn-primary flex-1 text-center py-4 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all">📥 Faylni yuklab olish</a>
+               <a href="${sub.filePath}" target="_blank" download class="btn-primary flex-1 text-center py-4 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all">📥 Download Manuscript</a>
                <button onclick="window.deleteSubmission('${sub.id}')" class="bg-red-50 text-red-500 px-6 py-4 rounded-xl font-bold border border-red-100 hover:bg-red-500 hover:text-white transition-all active:scale-95 flex items-center gap-2">🗑️ Arizani o'chirish</button>
             </div>
          </div>
@@ -846,8 +852,8 @@ function renderAdminContent(path, params) {
           <button onclick="window.msje_navigate('/admin/submissions?view=${sub.id}')" class="inline-flex items-center gap-1.5 text-accent hover:text-white border border-accent/20 hover:bg-accent px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all hover:scale-105 active:scale-95">
              👁️ Ko'rish
           </button>
-          <a href="/${sub.filePath}" download class="inline-flex items-center gap-1.5 text-blue-600 hover:text-white border border-blue-100 hover:bg-blue-600 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all hover:scale-105 active:scale-95 ml-2">
-             📥 Fayl
+          <a href="${sub.filePath}" target="_blank" download class="inline-flex items-center gap-1.5 text-blue-600 hover:text-white border border-blue-100 hover:bg-blue-600 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all hover:scale-105 active:scale-95 ml-2">
+             📥 File
           </a>
           <button onclick="window.deleteSubmission('${sub.id}')" class="inline-flex items-center gap-1.5 text-red-500 hover:text-white border border-red-100 hover:bg-red-500 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all hover:scale-105 active:scale-95 ml-2">
              🗑️ O'chirish
