@@ -26,8 +26,8 @@ async function loadData() {
 
     if (sInfo) {
       siteInfo = { ...initialSiteInfo, ...sInfo, shortName: sInfo.short_name || initialSiteInfo.shortName, submissionInfo: sInfo.submission_info || initialSiteInfo.submissionInfo };
-      // Force Internationalize if legacy data detected
-      if (siteInfo.address.includes('Tashkent') || siteInfo.address.includes('O\'zbekiston')) {
+      // Force Internationalize if legacy data detected (with safety check)
+      if (siteInfo.address && (siteInfo.address.includes('Tashkent') || siteInfo.address.includes('O\'zbekiston'))) {
         console.log('Legacy Uzbek data detected. Syncing to International English defaults...');
         siteInfo.address = initialSiteInfo.address;
         siteInfo.email = initialSiteInfo.email;
@@ -42,7 +42,11 @@ async function loadData() {
     }
     
     if (ann) announcements = ann;
-    if (iss) issues = iss.map(i => ({ ...i, issueNumber: i.issuenumber || i.issueNumber }));
+    if (iss) issues = iss.map(i => {
+      const mapped = { ...i, issueNumber: i.issuenumber || i.issueNumber || i.issue_number };
+      delete mapped.issuenumber;
+      return mapped;
+    });
     if (art) articles = art.map(a => ({ ...a, issueId: a.issue_id, firstPage: a.first_page, lastPage: a.last_page, publicationDate: a.publication_date, pdfPath: a.pdf_path, references: a.refs || a.references }));
     if (sub) submissions = sub.map(s => ({ ...s, filePath: s.file_path }));
     
@@ -1266,5 +1270,7 @@ function initNeuralBackground() {
   animate();
 }
 
-initNeuralBackground();
-loadData();
+window.addEventListener('DOMContentLoaded', () => {
+  initNeuralBackground();
+  loadData();
+});
