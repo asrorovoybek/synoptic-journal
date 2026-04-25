@@ -86,7 +86,10 @@ const saveState = async (table, data) => {
       const { error } = await supabase.from(table).upsert([dbData]);
       if (error) {
         console.error(`Supabase Save Error (${table}):`, error);
-        alert(`Xatolik yuz berdi (${table}): ` + error.message);
+        // Suppress alert for site_info schema cache issues
+        if (table !== 'site_info') {
+          alert(`Xatolik yuz berdi (${table}): ` + error.message);
+        }
         return false;
       }
       console.log(`Successfully saved to ${table}`);
