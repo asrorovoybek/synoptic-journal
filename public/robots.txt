@@ -6,4 +6,4 @@ Allow: /about
 Disallow: /admin/
 Disallow: /admin/*
 
-Sitemap: https://your-domain.com/sitemap.xml
+Sitemap: https://synoptic-journal.vercel.app/sitemap.xml

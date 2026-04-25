@@ -116,33 +116,23 @@ const saveState = async (table, data) => {
 
 // --- Meta Tag Manager (Google Scholar) ---
 function updateMetaTags(article) {
-  // Eski taglarni tozalash
+  // Clear old citation tags
   document.querySelectorAll('meta[name^="citation_"]').forEach(el => el.remove());
   if (!article) { document.title = siteInfo.name; return; }
   
   const issue = issues.find(i => i.id === article.issueId) || {};
-  
-  // Sanani qat'iy YYYY/MM/DD formatiga o'tkazish (nuqta yoki chiziqni to'g'irlaydi)
+  document.title = `${article.title} | ${siteInfo.shortName}`;
+
+  // Formatting date for academic standards (YYYY/MM/DD)
   const dateParts = article.publicationDate.split(/[\.\-\/]/);
   let formattedDate = article.publicationDate;
   if (dateParts.length === 3) {
-    // Agar sana DD.MM.YYYY formatida bo'lsa
-    if (dateParts[2].length === 4) formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-    // Agar sana YYYY.MM.DD formatida bo'lsa
-    else if (dateParts[0].length === 4) formattedDate = `${dateParts[0]}/${dateParts[1]}/${dateParts[2]}`;
+    if (dateParts[0].length === 4) formattedDate = `${dateParts[0]}/${dateParts[1]}/${dateParts[2]}`;
+    else if (dateParts[2].length === 4) formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
   }
 
   const tags = [
     { name: 'citation_title', content: article.title },
-  ];
-
-  // Mualliflar sarlavhadan keyin darhol kelishi kerak
-  article.authors.forEach(auth => {
-    tags.push({ name: 'citation_author', content: auth.fullName });
-    if (auth.affiliation) tags.push({ name: 'citation_author_institution', content: auth.affiliation });
-  });
-
-  tags.push(
     { name: 'citation_publication_date', content: formattedDate },
     { name: 'citation_journal_title', content: siteInfo.name },
     { name: 'citation_issn', content: siteInfo.issn },
@@ -150,12 +140,17 @@ function updateMetaTags(article) {
     { name: 'citation_issue', content: issue.issueNumber || '1' },
     { name: 'citation_firstpage', content: article.firstPage || '1' },
     { name: 'citation_lastpage', content: article.lastPage || '10' },
+    { name: 'citation_pdf_url', content: article.pdfPath },
     { name: 'citation_abstract_html_url', content: window.location.href },
-    { name: 'citation_pdf_url', content: window.location.origin + '/' + article.pdfPath },
     { name: 'citation_language', content: 'en' }
-  );
+  ];
 
   if (article.doi) tags.push({ name: 'citation_doi', content: article.doi });
+
+  article.authors.forEach(auth => {
+    tags.push({ name: 'citation_author', content: auth.fullName });
+    if (auth.affiliation) tags.push({ name: 'citation_author_institution', content: auth.affiliation });
+  });
 
   tags.forEach(tag => {
     if (tag.content) {
