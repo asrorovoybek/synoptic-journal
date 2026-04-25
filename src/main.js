@@ -47,7 +47,21 @@ async function loadData() {
       delete mapped.issuenumber;
       return mapped;
     });
-    if (art) articles = art.map(a => ({ ...a, issueId: a.issue_id, firstPage: a.first_page, lastPage: a.last_page, publicationDate: a.publication_date, pdfPath: a.pdf_path, references: a.refs || a.references }));
+    if (art) articles = art.map(a => {
+      let path = a.pdf_path || a.pdfPath;
+      if (path && !path.startsWith('http')) {
+        path = `${supabaseUrl}/storage/v1/object/public/pdfs/${path}`;
+      }
+      return { 
+        ...a, 
+        issueId: a.issue_id || a.issueId, 
+        firstPage: a.first_page || a.firstPage, 
+        lastPage: a.last_page || a.lastPage, 
+        publicationDate: a.publication_date || a.publicationDate, 
+        pdfPath: path, 
+        references: a.refs || a.references 
+      };
+    });
     if (sub) submissions = sub.map(s => ({ ...s, filePath: s.file_path }));
     
     console.log('Sync complete. Articles loaded:', articles.length);
