@@ -334,7 +334,7 @@ function renderPublic(path, params) {
                
                <div class="mt-8 flex justify-center gap-4">
                   <button onclick="window.togglePdfViewer()" class="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:bg-slate-800 transition-all flex items-center gap-2">👁️ View PDF</button>
-                  <a href="${art.pdfPath}" download class="bg-slate-100 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all flex items-center gap-2">📥 Download</a>
+                  <button onclick="window.forceDownload('${art.pdfPath}', '${art.title}.pdf')" class="bg-slate-100 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all flex items-center gap-2">📥 Download</button>
                   <button onclick="window.copyCitation()" class="bg-white border border-slate-200 text-slate-700 px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm">📋 Cite Article</button>
                </div>
              </header>
@@ -840,7 +840,7 @@ function renderAdminContent(path, params) {
                <pre class="text-xs bg-slate-50 p-4 rounded-xl whitespace-pre-wrap font-sans text-slate-500 border border-slate-100">${sub.references || 'Noma\'lum'}</pre>
             </div>
             <div class="flex gap-4 pt-6">
-               <a href="${sub.filePath}" target="_blank" download class="btn-primary flex-1 text-center py-4 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all">📥 Download Manuscript</a>
+               <button onclick="window.forceDownload('${sub.filePath}', 'Manuscript-${sub.id}.pdf')" class="btn-primary flex-1 text-center py-4 flex items-center justify-center gap-2 hover:scale-[1.02] transition-all">📥 Download Manuscript</button>
                <button onclick="window.deleteSubmission('${sub.id}')" class="bg-red-50 text-red-500 px-6 py-4 rounded-xl font-bold border border-red-100 hover:bg-red-500 hover:text-white transition-all active:scale-95 flex items-center gap-2">🗑️ Arizani o'chirish</button>
             </div>
          </div>
@@ -1189,6 +1189,19 @@ window.addAuthorField = () => {
     <div><label class="text-[10px] font-bold text-gray-400 uppercase">Phone Number</label><input placeholder="+998 90..." class="a-auth-phone w-full p-2.5 border rounded-lg mt-1"></div>
   `;
   container.appendChild(div);
+};
+window.forceDownload = (url, filename) => {
+  fetch(url).then(r => r.blob()).then(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename || 'document.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }).catch(e => {
+    console.error('Download error:', e);
+    window.open(url, '_blank');
+  });
 };
 window.togglePdfViewer = () => { const c = document.getElementById('pdf-viewer-container'); if (c) c.classList.toggle('hidden'); };
 window.copyCitation = () => {
