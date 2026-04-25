@@ -24,8 +24,17 @@ async function loadData() {
     const { data: art, error: rErr } = await supabase.from('articles').select('*');
     const { data: sub, error: uErr } = await supabase.from('submissions').select('*');
 
-    if (sErr) console.warn('Site Info not found, using default.');
-    if (sInfo) siteInfo = { ...initialSiteInfo, ...sInfo, shortName: sInfo.short_name || initialSiteInfo.shortName, submissionInfo: sInfo.submission_info || initialSiteInfo.submissionInfo };
+    if (sInfo) {
+      siteInfo = { ...initialSiteInfo, ...sInfo, shortName: sInfo.short_name || initialSiteInfo.shortName, submissionInfo: sInfo.submission_info || initialSiteInfo.submissionInfo };
+    } else {
+      console.log('No site info found, initializing with defaults...');
+      await saveState('site_info', { 
+        id: 'site-info', 
+        ...initialSiteInfo, 
+        short_name: initialSiteInfo.shortName, 
+        submission_info: initialSiteInfo.submissionInfo 
+      });
+    }
     
     if (ann) announcements = ann;
     if (iss) issues = iss.map(i => ({ ...i, issueNumber: i.issuenumber || i.issueNumber }));
