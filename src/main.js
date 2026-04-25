@@ -643,7 +643,10 @@ function getPublicFooter() {
         </div>
         <div class="border-t border-slate-800 pt-12 flex justify-between items-center text-xs text-gray-500">
            <p>&copy; ${new Date().getFullYear()} ${siteInfo.name}.</p>
-           <div class="flex gap-6"><a href="/admin/login" class="hover:text-white uppercase tracking-widest">Admin Login</a></div>
+            <div class="flex gap-6">
+               <span class="text-[8px] text-slate-700 uppercase tracking-widest">Build v1.0.1-Cloud</span>
+               <a href="/admin/login" class="hover:text-white uppercase tracking-widest">Admin Login</a>
+            </div>
         </div>
       </div>
     </footer>
