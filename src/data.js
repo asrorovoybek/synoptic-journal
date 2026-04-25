@@ -1,4 +1,4 @@
-// --- Boshlang'ich Ma'lumotlar ---
+// --- Initial Data ---
 export const initialSiteInfo = {
   name: "Synoptic: International Journal of Multidisciplinary Research",
   shortName: "SIJMR",
