@@ -782,13 +782,21 @@ function renderAdmin(path, params) {
 }
 
 function renderAdminLogin() {
-  app.innerHTML = `<div class="min-h-screen flex items-center justify-center bg-slate-900"><div class="max-w-md w-full bg-white p-10 rounded-2xl shadow-2xl">
-    <h1 class="text-2xl font-bold text-center mb-8 text-slate-800">Journal Management</h1>
-    <form id="login-form" class="space-y-6">
-        <div><label class="block text-sm font-bold mb-2">Username</label><input type="text" id="username" required class="w-full px-4 py-3 border rounded-lg outline-none"></div>
-        <div><label class="block text-sm font-bold mb-2">Password</label><input type="password" id="password" required class="w-full px-4 py-3 border rounded-lg outline-none"></div>
-        <button type="submit" class="w-full bg-primary text-white py-4 rounded-lg font-bold">Authentication</button>
-    </form></div></div>`;
+  app.innerHTML = `<div class="min-h-screen flex items-center justify-center bg-slate-900 px-4">
+    <div class="max-w-md w-full bg-white p-8 md:p-10 rounded-2xl shadow-2xl">
+      <div class="mb-8">
+        <button type="button" onclick="window.msje_navigate('/')" class="text-xs font-bold text-slate-400 hover:text-primary flex items-center gap-2 transition-colors uppercase tracking-widest">
+          &larr; Back to Home
+        </button>
+      </div>
+      <h1 class="text-2xl font-bold text-center mb-8 text-slate-800">Journal Management</h1>
+      <form id="login-form" class="space-y-6">
+          <div><label class="block text-sm font-bold mb-2">Username</label><input type="text" id="username" required class="w-full px-4 py-3 border rounded-lg outline-none"></div>
+          <div><label class="block text-sm font-bold mb-2">Password</label><input type="password" id="password" required class="w-full px-4 py-3 border rounded-lg outline-none"></div>
+          <button type="submit" class="w-full bg-primary text-white py-4 rounded-lg font-bold">Authentication</button>
+      </form>
+    </div>
+  </div>`;
   document.getElementById('login-form').onsubmit = (e) => {
     e.preventDefault();
     if (document.getElementById('username').value === 'Oybek' && document.getElementById('password').value === '250795') {
