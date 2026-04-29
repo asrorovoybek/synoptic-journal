@@ -191,13 +191,13 @@ function handleRoute() {
 // --- Public Templates ---
 function getPublicHeader() {
   return `
-    <header class="glass-header">
-      <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
-        <div class="flex items-center gap-4 cursor-pointer" onclick="window.msje_navigate('/')">
-          <div class="w-14 h-14 bg-primary rounded-2xl shadow-xl flex items-center justify-center text-white font-serif text-3xl font-bold ring-4 ring-white/10">${siteInfo.shortName.charAt(0)}</div>
+    <header class="glass-header relative z-50">
+      <div class="max-w-7xl mx-auto px-4 lg:px-6 h-20 md:h-24 flex items-center justify-between">
+        <div class="flex items-center gap-3 md:gap-4 cursor-pointer" onclick="window.msje_navigate('/')">
+          <div class="w-10 h-10 md:w-14 md:h-14 bg-primary rounded-xl md:rounded-2xl shadow-xl flex items-center justify-center text-white font-serif text-2xl md:text-3xl font-bold ring-2 md:ring-4 ring-white/10">${siteInfo.shortName.charAt(0)}</div>
           <div class="flex flex-col">
-            <span class="font-serif text-2xl font-bold text-primary tracking-tight leading-none">${siteInfo.shortName}</span>
-            <span class="text-[10px] text-accent font-black uppercase tracking-[0.3em] mt-1">International Platform</span>
+            <span class="font-serif text-lg md:text-2xl font-bold text-primary tracking-tight leading-none">${siteInfo.shortName}</span>
+            <span class="text-[8px] md:text-[10px] text-accent font-black uppercase tracking-[0.3em] mt-1">International Platform</span>
           </div>
         </div>
         <nav class="hidden lg:flex gap-12 text-sm font-bold text-slate-600 uppercase tracking-widest">
@@ -207,9 +207,20 @@ function getPublicHeader() {
           <button onclick="window.msje_navigate('/editorial')" class="hover:text-primary transition-all relative group">Editorial<span class="absolute -bottom-2 left-0 w-0 h-1 bg-accent transition-all group-hover:w-full rounded-full"></span></button>
           <button onclick="window.msje_navigate('/submissions')" class="hover:text-primary transition-all relative group">Submissions<span class="absolute -bottom-2 left-0 w-0 h-1 bg-accent transition-all group-hover:w-full rounded-full"></span></button>
         </nav>
-        <div class="flex items-center gap-6">
+        <div class="hidden lg:flex items-center gap-6">
           <button onclick="window.msje_navigate('/admin/login')" class="text-xs font-black text-slate-400 hover:text-primary border-2 border-slate-200 px-6 py-2.5 rounded-full transition-all tracking-[0.1em] uppercase">SIGN IN</button>
         </div>
+        <button onclick="window.toggleMobileMenu()" class="lg:hidden p-2 text-primary focus:outline-none">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+      </div>
+      <div id="mobile-menu" class="hidden lg:hidden absolute top-20 md:top-24 left-0 w-full bg-white shadow-2xl border-t border-slate-100 flex-col py-6 px-6 gap-6 text-sm font-bold text-slate-600 uppercase tracking-widest">
+          <button onclick="window.toggleMobileMenu(); window.msje_navigate('/')" class="w-full text-left pb-4 border-b hover:text-primary">Home</button>
+          <button onclick="window.toggleMobileMenu(); window.msje_navigate('/archive')" class="w-full text-left pb-4 border-b hover:text-primary">Archive</button>
+          <button onclick="window.toggleMobileMenu(); window.msje_navigate('/about')" class="w-full text-left pb-4 border-b hover:text-primary">About</button>
+          <button onclick="window.toggleMobileMenu(); window.msje_navigate('/editorial')" class="w-full text-left pb-4 border-b hover:text-primary">Editorial</button>
+          <button onclick="window.toggleMobileMenu(); window.msje_navigate('/submissions')" class="w-full text-left pb-4 border-b hover:text-primary">Submissions</button>
+          <button onclick="window.toggleMobileMenu(); window.msje_navigate('/admin/login')" class="w-full text-left text-xs font-black text-accent mt-2">SIGN IN (Admin)</button>
       </div>
     </header>
   `;
@@ -385,8 +396,8 @@ function renderPublic(path, params) {
                    </div>
                    <div class="text-[10px] font-black uppercase tracking-widest text-accent">${siteInfo.shortName} Reader</div>
                 </div>
-                <div class="flex-1">
-                   <iframe src="${art.pdfPath}" class="w-full h-full border-none" title="PDF Document Viewer"></iframe>
+                <div class="flex-1 relative overflow-hidden -webkit-overflow-scrolling-touch">
+                   <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(art.pdfPath)}&embedded=true" class="absolute inset-0 w-full h-full border-none" title="PDF Document Viewer"></iframe>
                 </div>
              </div>
           </article>
@@ -842,7 +853,7 @@ function renderAdminContent(path, params) {
        `;
     }
     return `<h1 class="text-3xl font-bold mb-8 text-primary">Kelib tushgan Arizalar</h1>
-      <div class="bg-white rounded-xl border overflow-hidden shadow-sm"><table class="w-full text-left"><thead class="bg-slate-50 border-b"><tr><th class="p-4">Sarlavha</th><th class="p-4 text-center">Amallar</th></tr></thead><tbody>
+      <div class="bg-white rounded-xl border overflow-x-auto shadow-sm"><table class="w-full text-left min-w-[600px]"><thead class="bg-slate-50 border-b"><tr><th class="p-4">Sarlavha</th><th class="p-4 text-center">Amallar</th></tr></thead><tbody>
         ${submissions.map(sub => `<tr class="border-b hover:bg-slate-50 transition-colors"> <td class="p-4 font-bold text-sm truncate max-w-md">${sub.title}</td><td class="p-4 text-center">
           <button onclick="window.msje_navigate('/admin/submissions?view=${sub.id}')" class="inline-flex items-center gap-1.5 text-accent hover:text-white border border-accent/20 hover:bg-accent px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all hover:scale-105 active:scale-95">
              👁️ Ko'rish
@@ -856,7 +867,7 @@ function renderAdminContent(path, params) {
       </tbody></table></div>`;
   } else if (path === '/admin/issues') {
     return `<div class="flex justify-between items-center mb-8"><h1 class="text-3xl font-bold">Nashrlar</h1><button onclick="window.msje_navigate('/admin/issue/new')" class="btn-primary">+ Yangi Nashr</button></div>
-      <div class="bg-white rounded-xl border overflow-hidden shadow-sm"><table class="w-full text-left"><thead class="bg-slate-50 border-b"><tr><th class="p-4">Nashr</th><th class="p-4 text-center">Amallar</th></tr></thead><tbody>
+      <div class="bg-white rounded-xl border overflow-x-auto shadow-sm"><table class="w-full text-left min-w-[600px]"><thead class="bg-slate-50 border-b"><tr><th class="p-4">Nashr</th><th class="p-4 text-center">Amallar</th></tr></thead><tbody>
         ${issues.map(iss => `<tr class="border-b"> <td class="p-4 font-bold">Vol ${iss.volume}, No ${iss.issueNumber} (${iss.year})</td><td class="p-4 text-center">
           <button onclick="window.msje_navigate('/admin/issue/edit?id=${iss.id}')" class="inline-flex items-center gap-1.5 text-accent hover:text-white border border-accent/20 hover:bg-accent px-4 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-sm">
             Tahrirlash
@@ -881,7 +892,7 @@ function renderAdminContent(path, params) {
         <button type="submit" class="btn-primary w-full py-4 font-bold">Saqlash</button></form>`;
   } else if (path === '/admin/articles') {
     return `<div class="flex justify-between items-center mb-8"><h1 class="text-3xl font-bold">Maqolalar</h1><button onclick="window.msje_navigate('/admin/article/new')" class="btn-primary">+ Yangi Maqola</button></div>
-      <div class="bg-white rounded-xl border overflow-hidden shadow-sm"><table class="w-full text-left"><thead class="bg-slate-50 border-b"><tr><th class="p-4">Sarlavha</th><th class="p-4 text-center">Amallar</th></tr></thead><tbody>
+      <div class="bg-white rounded-xl border overflow-x-auto shadow-sm"><table class="w-full text-left min-w-[600px]"><thead class="bg-slate-50 border-b"><tr><th class="p-4">Sarlavha</th><th class="p-4 text-center">Amallar</th></tr></thead><tbody>
         ${articles.map(art => `<tr class="border-b"> <td class="p-4 font-bold text-sm truncate max-w-lg">${art.title}</td><td class="p-4 text-center">
           <button onclick="window.msje_navigate('/admin/article/edit?id=${art.id}')" class="inline-flex items-center gap-1.5 text-accent hover:text-white border border-accent/20 hover:bg-accent px-4 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-sm">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -1198,7 +1209,25 @@ window.forceDownload = (url, filename) => {
     window.open(url, '_blank');
   });
 };
-window.togglePdfViewer = () => { const c = document.getElementById('pdf-viewer-container'); if (c) c.classList.toggle('hidden'); };
+window.togglePdfViewer = () => { 
+  const c = document.getElementById('pdf-viewer-container'); 
+  if (c) {
+    c.classList.toggle('hidden'); 
+    document.body.classList.toggle('overflow-hidden');
+  }
+};
+window.toggleMobileMenu = () => {
+  const m = document.getElementById('mobile-menu');
+  if(m) {
+    if(m.classList.contains('hidden')) {
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    } else {
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+  }
+};
 window.copyCitation = () => {
   const text = document.getElementById('citation-text').innerText;
   navigator.clipboard.writeText(text).then(() => {
