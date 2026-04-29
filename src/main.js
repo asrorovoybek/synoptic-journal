@@ -761,21 +761,21 @@ window.addSubAuthorField = () => {
 function renderAdmin(path, params) {
   if (path === '/admin/login') { renderAdminLogin(); return; }
   app.innerHTML = `
-    <div class="flex min-h-screen bg-gray-50">
-      <aside class="w-64 bg-slate-900 text-white p-6 sticky top-0 h-screen">
-        <div class="mb-10 text-center"><div class="w-12 h-12 bg-accent mx-auto rounded-lg flex items-center justify-center text-white text-xl font-bold mb-2">S</div><p class="text-xs font-bold text-gray-400">ADMIN PANEL</p></div>
-        <nav class="space-y-1">
-          <button onclick="window.msje_navigate('/')" class="w-full text-left p-3 rounded bg-accent/20 text-accent font-bold mb-6 hover:bg-accent/30 flex items-center gap-3">🏠 Saytni ko'rish</button>
-          <button onclick="window.msje_navigate('/admin/dashboard')" class="w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3">📊 Statistika</button>
-          <button onclick="window.msje_navigate('/admin/submissions')" class="w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3">📥 Arizalar (${submissions.length})</button>
-          <button onclick="window.msje_navigate('/admin/issues')" class="w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3">📚 Nashrlar</button>
-          <button onclick="window.msje_navigate('/admin/articles')" class="w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3">📝 Maqolalar</button>
-          <button onclick="window.msje_navigate('/admin/announcements')" class="w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3">📢 E'lonlar</button>
-          <button onclick="window.msje_navigate('/admin/settings')" class="w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3">⚙️ Sozlamalar</button>
-          <button onclick="localStorage.removeItem('msje_admin_auth'); window.location.reload()" class="w-full text-left p-3 rounded hover:bg-red-900/40 text-red-400 mt-20 flex items-center gap-3">🚪 Chiqish</button>
+    <div class="flex flex-col md:flex-row min-h-screen bg-gray-50 w-full overflow-hidden">
+      <aside class="w-full md:w-64 bg-slate-900 text-white p-4 md:p-6 md:sticky top-0 md:h-screen z-10 shadow-lg md:shadow-none flex-shrink-0">
+        <div class="hidden md:block mb-10 text-center"><div class="w-12 h-12 bg-accent mx-auto rounded-lg flex items-center justify-center text-white text-xl font-bold mb-2">S</div><p class="text-xs font-bold text-gray-400">ADMIN PANEL</p></div>
+        <nav class="flex overflow-x-auto md:block md:space-y-1 gap-2 pb-2 md:pb-0 scrollbar-hide">
+          <button onclick="window.msje_navigate('/')" class="whitespace-nowrap md:w-full text-left p-3 rounded bg-accent/20 text-accent font-bold md:mb-6 hover:bg-accent/30 flex items-center gap-3 text-sm">🏠 Saytni ko'rish</button>
+          <button onclick="window.msje_navigate('/admin/dashboard')" class="whitespace-nowrap md:w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3 text-sm">📊 Statistika</button>
+          <button onclick="window.msje_navigate('/admin/submissions')" class="whitespace-nowrap md:w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3 text-sm">📥 Arizalar (${submissions.length})</button>
+          <button onclick="window.msje_navigate('/admin/issues')" class="whitespace-nowrap md:w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3 text-sm">📚 Nashrlar</button>
+          <button onclick="window.msje_navigate('/admin/articles')" class="whitespace-nowrap md:w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3 text-sm">📝 Maqolalar</button>
+          <button onclick="window.msje_navigate('/admin/announcements')" class="whitespace-nowrap md:w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3 text-sm">📢 E'lonlar</button>
+          <button onclick="window.msje_navigate('/admin/settings')" class="whitespace-nowrap md:w-full text-left p-3 rounded hover:bg-slate-800 flex items-center gap-3 text-sm">⚙️ Sozlamalar</button>
+          <button onclick="localStorage.removeItem('msje_admin_auth'); window.location.reload()" class="whitespace-nowrap md:w-full text-left p-3 rounded hover:bg-red-900/40 text-red-400 md:mt-20 flex items-center gap-3 text-sm">🚪 Chiqish</button>
         </nav>
       </aside>
-      <main class="flex-1 p-10 overflow-y-auto">${renderAdminContent(path, params)}</main>
+      <main class="flex-1 p-4 md:p-10 overflow-x-hidden overflow-y-auto w-full">${renderAdminContent(path, params)}</main>
     </div>
   `;
   attachAdminEvents(path, params);
