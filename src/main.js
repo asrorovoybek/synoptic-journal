@@ -27,17 +27,11 @@ async function loadData() {
     if (sInfo) {
       siteInfo = { ...initialSiteInfo, ...sInfo, shortName: sInfo.short_name || initialSiteInfo.shortName, submissionInfo: sInfo.submission_info || initialSiteInfo.submissionInfo };
       // Force Internationalize if legacy data detected (with safety check)
-      if (siteInfo.address && (siteInfo.address.includes('Tashkent') || siteInfo.address.includes('O\'zbekiston'))) {
-        console.log('Legacy Uzbek data detected. Syncing to International English defaults...');
+      if (siteInfo.address && (siteInfo.address.includes('Tashkent') || siteInfo.address.includes("O'zbekiston"))) {
+        console.log('Legacy Uzbek data detected. Using International English defaults in memory...');
         siteInfo.address = initialSiteInfo.address;
         siteInfo.email = initialSiteInfo.email;
         siteInfo.phone = initialSiteInfo.phone;
-        await saveState('site_info', { 
-          id: 'site-info', 
-          ...siteInfo, 
-          short_name: siteInfo.shortName, 
-          submission_info: siteInfo.submissionInfo 
-        });
       }
     }
     
