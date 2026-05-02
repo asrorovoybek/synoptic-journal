@@ -111,7 +111,7 @@ const saveState = async (table, data) => {
 // --- Meta Tag Manager (Google Scholar) ---
 function updateMetaTags(article) {
   // Clear old citation tags
-  document.querySelectorAll('meta[name^="citation_"]').forEach(el => el.remove());
+  document.querySelectorAll('meta[name^="citation_"], meta[name^="DC."]').forEach(el => el.remove());
   if (!article) { document.title = siteInfo.name; return; }
   
   const issue = issues.find(i => i.id === article.issueId) || {};
@@ -126,7 +126,18 @@ function updateMetaTags(article) {
   }
 
   const tags = [
+    // Dublin Core Tags (DC)
+    { name: 'DC.Title', content: article.title },
+    { name: 'DC.Date.issued', content: formattedDate.replace(/\//g, '-') },
+    { name: 'DC.Language', content: 'en' },
+    { name: 'DC.Format', content: 'application/pdf' },
+    { name: 'DC.Identifier.URI', content: window.location.href },
+    { name: 'DC.Source', content: siteInfo.name },
+    { name: 'DC.Type', content: 'Text.Serial.Journal' },
+    
+    // Highwire Press Tags (citation_*)
     { name: 'citation_title', content: article.title },
+    { name: 'citation_date', content: formattedDate },
     { name: 'citation_publication_date', content: formattedDate },
     { name: 'citation_journal_title', content: siteInfo.name },
     { name: 'citation_issn', content: siteInfo.issn },
@@ -139,12 +150,25 @@ function updateMetaTags(article) {
     { name: 'citation_language', content: 'en' }
   ];
 
-  if (article.doi) tags.push({ name: 'citation_doi', content: article.doi });
+  if (article.abstract) tags.push({ name: 'citation_abstract', content: article.abstract });
+  if (article.keywords) tags.push({ name: 'citation_keywords', content: article.keywords });
+  if (article.doi) {
+    tags.push({ name: 'citation_doi', content: article.doi });
+    tags.push({ name: 'DC.Identifier', content: article.doi });
+  }
 
   article.authors.forEach(auth => {
     tags.push({ name: 'citation_author', content: auth.fullName });
+    tags.push({ name: 'DC.Creator.PersonalName', content: auth.fullName });
     if (auth.affiliation) tags.push({ name: 'citation_author_institution', content: auth.affiliation });
   });
+
+  if (article.references) {
+    const refsArray = article.references.split(/\r?\n/).filter(r => r.trim() !== '');
+    refsArray.forEach(ref => {
+      tags.push({ name: 'citation_reference', content: ref.trim() });
+    });
+  }
 
   tags.forEach(tag => {
     if (tag.content) {
