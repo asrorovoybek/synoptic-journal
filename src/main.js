@@ -159,15 +159,21 @@ function updateMetaTags(article) {
   }
 
   (article.authors || []).forEach(auth => {
-    tags.push({ name: 'citation_author', content: auth.fullName });
-    tags.push({ name: 'DC.Creator.PersonalName', content: auth.fullName });
+    const name = auth.fullName || 'Unknown Author';
+    tags.push({ name: 'citation_author', content: name });
+    tags.push({ name: 'DC.Creator.PersonalName', content: name });
     if (auth.affiliation) tags.push({ name: 'citation_author_institution', content: auth.affiliation });
   });
 
   if (article.references) {
-    const refsArray = article.references.split(/\r?\n/).filter(r => r.trim() !== '');
+    let refsArray = [];
+    if (typeof article.references === 'string') {
+       refsArray = article.references.split(/\r?\n/).filter(r => r.trim() !== '');
+    } else if (Array.isArray(article.references)) {
+       refsArray = article.references;
+    }
     refsArray.forEach(ref => {
-      tags.push({ name: 'citation_reference', content: ref.trim() });
+      tags.push({ name: 'citation_reference', content: (ref || '').trim() });
     });
   }
 
@@ -344,9 +350,9 @@ function renderPublic(path, params) {
                <span class="inline-block px-3 py-1 bg-accent/10 text-accent text-[10px] font-bold rounded-full mb-4 uppercase tracking-widest">${art.type}</span>
                <h1 class="text-2xl md:text-3xl font-serif font-bold mb-6 leading-tight text-primary max-w-3xl mx-auto">${art.title}</h1>
                <div class="flex flex-wrap justify-center gap-8">
-                  ${art.authors.map(a => `
+                  ${(art.authors || []).map(a => `
                     <div class="text-center">
-                       <p class="text-lg font-serif font-bold text-slate-800">${a.fullName}</p>
+                       <p class="text-lg font-serif font-bold text-slate-800">${a.fullName || 'Unknown Author'}</p>
                        <p class="text-xs text-slate-500 font-medium italic mb-2">${a.affiliation || 'Scientific Institution'}</p>
                        <div class="flex flex-wrap justify-center gap-3">
                           ${a.email ? `<span class="text-[10px] text-slate-400 border border-slate-100 px-2 py-0.5 rounded italic">📧 ${a.email}</span>` : ''}
@@ -381,7 +387,7 @@ function renderPublic(path, params) {
                 <section class="border-t border-slate-50 pt-10">
                    <h2 class="text-sm font-black text-primary uppercase tracking-[0.2em] mb-6 flex items-center gap-2"><span class="w-1 h-4 bg-accent"></span> References</h2>
                    <div class="space-y-4 text-sm text-gray-500 leading-relaxed text-justify">
-                     ${art.references ? art.references.split(/\\r?\\n/).filter(r => r.trim() !== '').map((r, i) => `<p class="pl-6 relative"><span class="absolute left-0 font-bold text-accent">${i+1}.</span> ${r}</p>`).join('') : '<p>No references available.</p>'}
+                     ${art.references ? (typeof art.references === 'string' ? art.references.split(/\r?\n/) : (Array.isArray(art.references) ? art.references : [])).filter(r => r && r.trim() !== '').map((r, i) => `<p class="pl-6 relative"><span class="absolute left-0 font-bold text-accent">${i+1}.</span> ${r}</p>`).join('') : '<p>No references available.</p>'}
                    </div>
                 </section>
                 
@@ -421,7 +427,7 @@ function renderPublic(path, params) {
              </div>
           </article>
           <div id="citation-text" class="hidden">
-             ${(art.authors || []).map(a => a.fullName.split(' ').pop() + ', ' + a.fullName.charAt(0) + '.').join(', ')} (${(art.publicationDate || '').split(/[\.\-\/]/)[0]}). ${art.title}. ${siteInfo.name}.
+             ${(art.authors || []).map(a => (a.fullName || 'Unknown').split(' ').pop() + ', ' + (a.fullName || 'U').charAt(0) + '.').join(', ')} (${(art.publicationDate || '').split(/[\.\-\/]/)[0]}). ${art.title}. ${siteInfo.name}.
           </div>
        </main>
      `;
