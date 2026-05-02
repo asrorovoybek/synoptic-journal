@@ -118,9 +118,10 @@ function updateMetaTags(article) {
   document.title = `${article.title} | ${siteInfo.shortName}`;
 
   // Formatting date for academic standards (YYYY/MM/DD)
-  const dateParts = article.publicationDate.split(/[\.\-\/]/);
-  let formattedDate = article.publicationDate;
-  if (dateParts.length === 3) {
+  const pubDate = article.publicationDate || '';
+  const dateParts = pubDate.split(/[\.\-\/]/);
+  let formattedDate = pubDate;
+  if (pubDate && dateParts.length === 3) {
     if (dateParts[0].length === 4) formattedDate = `${dateParts[0]}/${dateParts[1]}/${dateParts[2]}`;
     else if (dateParts[2].length === 4) formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
   }
@@ -157,7 +158,7 @@ function updateMetaTags(article) {
     tags.push({ name: 'DC.Identifier', content: article.doi });
   }
 
-  article.authors.forEach(auth => {
+  (article.authors || []).forEach(auth => {
     tags.push({ name: 'citation_author', content: auth.fullName });
     tags.push({ name: 'DC.Creator.PersonalName', content: auth.fullName });
     if (auth.affiliation) tags.push({ name: 'citation_author_institution', content: auth.affiliation });
@@ -380,7 +381,7 @@ function renderPublic(path, params) {
                 <section class="border-t border-slate-50 pt-10">
                    <h2 class="text-sm font-black text-primary uppercase tracking-[0.2em] mb-6 flex items-center gap-2"><span class="w-1 h-4 bg-accent"></span> References</h2>
                    <div class="space-y-4 text-sm text-gray-500 leading-relaxed text-justify">
-                     ${art.references.map((r, i) => `<p class="pl-6 relative"><span class="absolute left-0 font-bold text-accent">${i+1}.</span> ${r}</p>`).join('')}
+                     ${art.references ? art.references.split(/\\r?\\n/).filter(r => r.trim() !== '').map((r, i) => `<p class="pl-6 relative"><span class="absolute left-0 font-bold text-accent">${i+1}.</span> ${r}</p>`).join('') : '<p>No references available.</p>'}
                    </div>
                 </section>
                 
@@ -420,7 +421,7 @@ function renderPublic(path, params) {
              </div>
           </article>
           <div id="citation-text" class="hidden">
-             ${art.authors.map(a => a.fullName.split(' ').pop() + ', ' + a.fullName.charAt(0) + '.').join(', ')} (${art.publicationDate.split('/')[0]}). ${art.title}. ${siteInfo.name}.
+             ${(art.authors || []).map(a => a.fullName.split(' ').pop() + ', ' + a.fullName.charAt(0) + '.').join(', ')} (${(art.publicationDate || '').split(/[\.\-\/]/)[0]}). ${art.title}. ${siteInfo.name}.
           </div>
        </main>
      `;
