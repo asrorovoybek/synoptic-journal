@@ -185,6 +185,49 @@ function updateMetaTags(article) {
       document.head.appendChild(meta);
     }
   });
+
+  // Clear old JSON-LD
+  document.querySelectorAll('script[type="application/ld+json"]').forEach(el => el.remove());
+
+  // Generate JSON-LD Schema
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": article.title,
+    "datePublished": formattedDate,
+    "author": (article.authors || []).map(a => ({
+      "@type": "Person",
+      "name": a.fullName || 'Unknown Author',
+      "affiliation": a.affiliation ? { "@type": "Organization", "name": a.affiliation } : undefined
+    })),
+    "publisher": {
+      "@type": "Organization",
+      "name": siteInfo.name
+    },
+    "isPartOf": {
+      "@type": "PublicationIssue",
+      "issueNumber": issue.issueNumber || "1",
+      "isPartOf": {
+        "@type": "PublicationVolume",
+        "volumeNumber": issue.volume || "1",
+        "isPartOf": {
+          "@type": "Periodical",
+          "name": siteInfo.name,
+          "issn": siteInfo.issn
+        }
+      }
+    },
+    "description": article.abstract,
+    "keywords": article.keywords,
+    "url": window.location.href,
+    "sameAs": article.pdfPath
+  };
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.text = JSON.stringify(schema);
+  document.head.appendChild(script);
+
   document.title = `${article.title} | ${siteInfo.name}`;
 }
 
