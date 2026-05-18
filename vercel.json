@@ -1,8 +1,44 @@
 {
   "rewrites": [
     {
-      "source": "/repec/:path*",
-      "destination": "/api/repec?file=:path*"
+      "source": "/repec/snp/snparch.rdf",
+      "destination": "/api/repec?file=snp/snparch.rdf"
+    },
+    {
+      "source": "/repec/snp/snpseri.rdf",
+      "destination": "/api/repec?file=snp/snpseri.rdf"
+    },
+    {
+      "source": "/repec/snp/journl/:id.rdf",
+      "destination": "/api/repec?file=snp/journl/:id.rdf"
+    },
+    {
+      "source": "/repec/snp/journl/",
+      "destination": "/api/repec?file=snp/journl/"
+    },
+    {
+      "source": "/repec/snp/journl/index.html",
+      "destination": "/api/repec?file=snp/journl/index.html"
+    },
+    {
+      "source": "/repec/snp/journl",
+      "destination": "/api/repec?file=snp/journl/"
+    },
+    {
+      "source": "/repec/snp/",
+      "destination": "/api/repec?file=snp/"
+    },
+    {
+      "source": "/repec/snp/index.html",
+      "destination": "/api/repec?file=snp/"
+    },
+    {
+      "source": "/repec/snp",
+      "destination": "/api/repec?file=snp/"
+    },
+    {
+      "source": "/repec",
+      "destination": "/api/repec?file=snp/"
     },
     {
       "source": "/(.*)",
