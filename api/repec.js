@@ -6,74 +6,128 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+
+  const file = req.query.file || '';
+  console.log("Requested RePEc file:", file);
 
   try {
     const { data: sInfo } = await supabase.from('site_info').select('*').single();
     const { data: articles } = await supabase.from('articles').select('*');
     const { data: issues } = await supabase.from('issues').select('*');
 
-    let rdf = '';
-    
-    // Archive Template
-    rdf += `Template-type: ReDIF-Archive 1.0\n`;
-    rdf += `Handle: RePEc:snp\n`;
-    rdf += `Name: Synoptic Journal Archive\n`;
-    rdf += `Maintainer-Name: Editor\n`;
-    rdf += `Maintainer-Email: ${sInfo?.email || 'editor@synoptic-journal.com'}\n`;
-    rdf += `Description: This archive collects articles from Synoptic: International Journal of Multidisciplinary Research.\n`;
-    rdf += `URL: https://synoptic-journal.vercel.app/\n\n`;
+    const email = sInfo?.email || 'info@synoptic.uz';
+    const siteUrl = 'https://synoptic-journal.vercel.app';
 
-    // Series Template
-    rdf += `Template-type: ReDIF-Series 1.0\n`;
-    rdf += `Name: Synoptic: International Journal of Multidisciplinary Research\n`;
-    rdf += `Provider-Name: Synoptic Publisher\n`;
-    rdf += `Provider-Homepage: https://synoptic-journal.vercel.app/\n`;
-    rdf += `Maintainer-Name: Editor\n`;
-    rdf += `Maintainer-Email: ${sInfo?.email || 'editor@synoptic-journal.com'}\n`;
-    rdf += `Type: ReDIF-Article\n`;
-    rdf += `Handle: RePEc:snp:journl\n\n`;
-
-    if (articles && articles.length > 0) {
-      articles.forEach(art => {
-        const issue = (issues || []).find(i => i.id === (art.issue_id || art.issueId)) || {};
-        rdf += `Template-Type: ReDIF-Article 1.0\n`;
-        rdf += `Title: ${art.title}\n`;
-        
-        const authors = art.authors || [];
-        authors.forEach(a => {
-          rdf += `Author-Name: ${a.fullName}\n`;
-          if (a.email) rdf += `Author-Email: ${a.email}\n`;
-          if (a.affiliation) rdf += `Author-Workplace-Name: ${a.affiliation}\n`;
-        });
-        
-        if (art.abstract) rdf += `Abstract: ${art.abstract.replace(/\r?\n/g, ' ')}\n`;
-        if (art.keywords) rdf += `Keywords: ${art.keywords}\n`;
-        
-        let pubDate = art.publication_date || art.publicationDate || '';
-        if (pubDate.includes('.')) pubDate = pubDate.replace(/\./g, '-');
-        if (pubDate.includes('/')) pubDate = pubDate.replace(/\//g, '-');
-        
-        rdf += `Creation-Date: ${pubDate || '2026'}\n`;
-        rdf += `Journal: Synoptic: International Journal of Multidisciplinary Research\n`;
-        rdf += `Volume: ${issue.volume || '1'}\n`;
-        rdf += `Issue: ${issue.issue_number || issue.issueNumber || issue.issuenumber || '1'}\n`;
-        if (art.first_page || art.firstPage) rdf += `Pages: ${(art.first_page || art.firstPage)}-${(art.last_page || art.lastPage)}\n`;
-        
-        let pdfPath = art.pdf_path || art.pdfPath;
-        if (pdfPath && !pdfPath.startsWith('http')) {
-          pdfPath = `${supabaseUrl}/storage/v1/object/public/pdfs/${pdfPath}`;
-        }
-        if (pdfPath) {
-          rdf += `File-URL: ${pdfPath}\n`;
-          rdf += `File-Format: Application/pdf\n`;
-        }
-        
-        rdf += `Handle: RePEc:snp:journl:${art.id}\n\n`;
-      });
+    // 1. Root Archive Index
+    if (file === '' || file === '/' || file === 'snp' || file === 'snp/' || file === 'snp/index.html') {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(`
+        <html>
+        <body>
+          <h1>RePEc Archive: snp</h1>
+          <ul>
+            <li><a href="/repec/snp/snparch.rdf">snparch.rdf</a> (Archive Template)</li>
+            <li><a href="/repec/snp/snpseri.rdf">snpseri.rdf</a> (Series Template)</li>
+            <li><a href="/repec/snp/journl/">journl/</a> (Subdirectory for Articles)</li>
+          </ul>
+        </body>
+        </html>
+      `);
     }
-    
-    res.status(200).send(rdf);
+
+    // 2. Archive Template
+    if (file === 'snp/snparch.rdf') {
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      return res.status(200).send(`Template-type: ReDIF-Archive 1.0
+Handle: RePEc:snp
+Name: Synoptic Journal Archive
+Maintainer-Name: Editor
+Maintainer-Email: ${email}
+Description: This archive collects articles from Synoptic: International Journal of Multidisciplinary Research.
+URL: ${siteUrl}/repec/snp/
+`);
+    }
+
+    // 3. Series Template
+    if (file === 'snp/snpseri.rdf') {
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      return res.status(200).send(`Template-type: ReDIF-Series 1.0
+Name: Synoptic: International Journal of Multidisciplinary Research
+Provider-Name: Synoptic Publisher
+Provider-Homepage: ${siteUrl}/
+Maintainer-Name: Editor
+Maintainer-Email: ${email}
+Type: ReDIF-Article
+Handle: RePEc:snp:journl
+`);
+    }
+
+    // 4. Subdirectory Index (journl/)
+    if (file === 'snp/journl' || file === 'snp/journl/' || file === 'snp/journl/index.html') {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      let links = (articles || []).map(art => `<li><a href="/repec/snp/journl/${art.id}.rdf">${art.id}.rdf</a></li>`).join('');
+      return res.status(200).send(`
+        <html>
+        <body>
+          <h1>Series: journl</h1>
+          <ul>
+            ${links}
+          </ul>
+        </body>
+        </html>
+      `);
+    }
+
+    // 5. Article Templates
+    if (file.startsWith('snp/journl/') && file.endsWith('.rdf')) {
+      const artId = file.split('/').pop().replace('.rdf', '');
+      const art = (articles || []).find(a => a.id === artId);
+      
+      if (!art) {
+        return res.status(404).send('Article not found');
+      }
+
+      const issue = (issues || []).find(i => i.id === (art.issue_id || art.issueId)) || {};
+      
+      let rdf = `Template-Type: ReDIF-Article 1.0\n`;
+      rdf += `Title: ${art.title}\n`;
+      
+      const authors = art.authors || [];
+      authors.forEach(a => {
+        rdf += `Author-Name: ${a.fullName}\n`;
+        if (a.email) rdf += `Author-Email: ${a.email}\n`;
+        if (a.affiliation) rdf += `Author-Workplace-Name: ${a.affiliation}\n`;
+      });
+      
+      if (art.abstract) rdf += `Abstract: ${art.abstract.replace(/\r?\n/g, ' ')}\n`;
+      if (art.keywords) rdf += `Keywords: ${art.keywords}\n`;
+      
+      let pubDate = art.publication_date || art.publicationDate || '';
+      if (pubDate.includes('.')) pubDate = pubDate.replace(/\./g, '-');
+      if (pubDate.includes('/')) pubDate = pubDate.replace(/\//g, '-');
+      
+      rdf += `Creation-Date: ${pubDate || '2026'}\n`;
+      rdf += `Journal: Synoptic: International Journal of Multidisciplinary Research\n`;
+      rdf += `Volume: ${issue.volume || '1'}\n`;
+      rdf += `Issue: ${issue.issue_number || issue.issueNumber || issue.issuenumber || '1'}\n`;
+      if (art.first_page || art.firstPage) rdf += `Pages: ${(art.first_page || art.firstPage)}-${(art.last_page || art.lastPage)}\n`;
+      
+      let pdfPath = art.pdf_path || art.pdfPath;
+      if (pdfPath && !pdfPath.startsWith('http')) {
+        pdfPath = `${supabaseUrl}/storage/v1/object/public/pdfs/${pdfPath}`;
+      }
+      if (pdfPath) {
+        rdf += `File-URL: ${pdfPath}\n`;
+        rdf += `File-Format: Application/pdf\n`;
+      }
+      
+      rdf += `Handle: RePEc:snp:journl:${art.id}\n`;
+
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      return res.status(200).send(rdf);
+    }
+
+    res.status(404).send('Not Found');
 
   } catch (error) {
     console.error(error);
