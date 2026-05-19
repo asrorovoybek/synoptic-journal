@@ -709,7 +709,7 @@ function getPublicFooter() {
                 <div class="w-10 h-10 bg-white text-slate-900 rounded flex items-center justify-center font-bold text-xl">${siteInfo.shortName.charAt(0)}</div>
                 <span class="font-bold text-xl tracking-tight">${siteInfo.shortName}</span>
              </div>
-             <p class="text-gray-400 text-sm leading-relaxed mb-8">${siteInfo.description.substring(0, 150)}...</p>
+             <p class="text-gray-400 text-sm leading-relaxed mb-8">${siteInfo.description}</p>
           </div>
           <div>
              <h4 class="font-bold text-sm uppercase tracking-widest text-accent mb-8">Quick Links</h4>
@@ -724,8 +724,9 @@ function getPublicFooter() {
              <h4 class="font-bold text-sm uppercase tracking-widest text-accent mb-8">Indexing</h4>
              <ul class="space-y-4 text-sm text-gray-400 font-bold">
                 <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Google Scholar</li>
-                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> CrossRef DOI</li>
-                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> DOAJ Index</li>
+                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> RePEc Archive</li>
+                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Zenodo</li>
+                <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> OpenAIRE</li>
              </ul>
           </div>
           <div>

@@ -4,7 +4,7 @@ export const initialSiteInfo = {
   shortName: "SIJMR",
   tagline: "Advancing Global Knowledge Through Rigorous Interdisciplinary Research",
   issn: "2994-9580 (Online)",
-  description: "Synoptic is a premier, double-blind peer-reviewed international journal dedicated to publishing high-quality research across all major academic disciplines. We bridge the gap between theory and practice.",
+  description: "Synoptic is an international, peer-reviewed, open-access multidisciplinary journal committed to advancing global scientific discourse by publishing rigorous, innovative, and high-impact research across diverse fields of science, technology, and humanities.",
   scope: "Natural Sciences, Engineering, Health Sciences, Social Sciences, Arts, and Business Management.",
   submissionInfo: "Published monthly. We accept original research, reviews, and short communications.",
   deadline: "Manuscripts submitted by the 20th of each month will be considered for the upcoming issue.",
