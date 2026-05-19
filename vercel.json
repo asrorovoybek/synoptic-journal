@@ -9,6 +9,10 @@
       "destination": "/api/repec?file=snp/snpseri.rdf"
     },
     {
+      "source": "/repec/snp/journl/:id.redif",
+      "destination": "/api/repec?file=snp/journl/:id.redif"
+    },
+    {
       "source": "/repec/snp/journl/:id.rdf",
       "destination": "/api/repec?file=snp/journl/:id.rdf"
     },

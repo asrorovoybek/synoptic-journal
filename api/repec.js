@@ -63,9 +63,10 @@ Handle: RePEc:snp:journl
     }
 
     // 4. Subdirectory Index (journl/)
+    // Switch links to .redif so RePEc parses them as UTF-8 (Unicode) and resolves Windows-1252 character warnings!
     if (file === 'snp/journl' || file === 'snp/journl/' || file === 'snp/journl/index.html') {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      let links = (articles || []).map(art => `<li><a href="/repec/snp/journl/${art.id}.rdf">${art.id}.rdf</a></li>`).join('');
+      let links = (articles || []).map(art => `<li><a href="/repec/snp/journl/${art.id}.redif">${art.id}.redif</a></li>`).join('');
       return res.status(200).send(`
         <html>
         <body>
@@ -78,9 +79,9 @@ Handle: RePEc:snp:journl
       `);
     }
 
-    // 5. Article Templates
-    if (file.startsWith('snp/journl/') && file.endsWith('.rdf')) {
-      const artId = file.split('/').pop().replace('.rdf', '');
+    // 5. Article Templates (Support both legacy .rdf and modern .redif)
+    if (file.startsWith('snp/journl/') && (file.endsWith('.redif') || file.endsWith('.rdf'))) {
+      const artId = file.split('/').pop().replace(/\.redif|\.rdf/, '');
       const art = (articles || []).find(a => a.id === artId);
       
       if (!art) {
