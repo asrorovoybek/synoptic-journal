@@ -4,6 +4,52 @@ const supabaseUrl = 'https://lmhqneinkzpxfhahvcvx.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtaHFuZWlua3pweGZoYWh2Y3Z4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNDY2NDMsImV4cCI6MjA5MjYyMjY0M30.gF5LkfzuDFywZ7iFJh5kEqwaCpu91ixrIHPBa_YxxL4';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+function cleanHomoglyphs(text) {
+  if (typeof text !== 'string') return text;
+  
+  const homoglyphs = {
+    // Uppercase
+    '\u0410': 'A', // Cyrillic А
+    '\u0412': 'B', // Cyrillic В
+    '\u0421': 'C', // Cyrillic С
+    '\u0415': 'E', // Cyrillic Е
+    '\u041d': 'H', // Cyrillic Н
+    '\u0406': 'I', // Cyrillic І
+    '\u041a': 'K', // Cyrillic К
+    '\u041c': 'M', // Cyrillic М
+    '\u041e': 'O', // Cyrillic О
+    '\u0420': 'P', // Cyrillic Р
+    '\u0422': 'T', // Cyrillic Т
+    '\u0425': 'X', // Cyrillic Х
+    '\u04AE': 'Y', // Cyrillic Ү
+    '\u0405': 'S', // Cyrillic Ѕ
+    
+    // Lowercase
+    '\u0430': 'a', // Cyrillic а
+    '\u0441': 'c', // Cyrillic с
+    '\u0435': 'e', // Cyrillic е
+    '\u0456': 'i', // Cyrillic і
+    '\u043e': 'o', // Cyrillic о
+    '\u0440': 'p', // Cyrillic р
+    '\u0445': 'x', // Cyrillic х
+    '\u0443': 'y', // Cyrillic у
+    '\u04af': 'y', // Cyrillic ү
+    '\u0455': 's', // Cyrillic ѕ
+    
+    // Punctuation & other characters
+    '\u2013': '-', // En-dash –
+    '\u2014': '-', // Em-dash —
+    '\u201c': '"', // Smart double quote open “
+    '\u201d': '"', // Smart double quote close ”
+    '\u2018': "'", // Smart single quote open ‘
+    '\u2019': "'", // Smart single quote close ’
+    '\u00a0': ' ', // Non-breaking space
+  };
+
+  return text.split('').map(char => homoglyphs[char] || char).join('');
+}
+
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -91,17 +137,17 @@ Handle: RePEc:snp:journl
       const issue = (issues || []).find(i => i.id === (art.issue_id || art.issueId)) || {};
       
       let rdf = `Template-Type: ReDIF-Article 1.0\n`;
-      rdf += `Title: ${art.title}\n`;
+      rdf += `Title: ${cleanHomoglyphs(art.title || '')}\n`;
       
       const authors = art.authors || [];
       authors.forEach(a => {
-        rdf += `Author-Name: ${a.fullName}\n`;
+        rdf += `Author-Name: ${cleanHomoglyphs(a.fullName || '')}\n`;
         if (a.email) rdf += `Author-Email: ${a.email}\n`;
-        if (a.affiliation) rdf += `Author-Workplace-Name: ${a.affiliation}\n`;
+        if (a.affiliation) rdf += `Author-Workplace-Name: ${cleanHomoglyphs(a.affiliation || '')}\n`;
       });
       
-      if (art.abstract) rdf += `Abstract: ${art.abstract.replace(/\r?\n/g, ' ')}\n`;
-      if (art.keywords) rdf += `Keywords: ${art.keywords}\n`;
+      if (art.abstract) rdf += `Abstract: ${cleanHomoglyphs(art.abstract.replace(/\r?\n/g, ' ') || '')}\n`;
+      if (art.keywords) rdf += `Keywords: ${cleanHomoglyphs(art.keywords || '')}\n`;
       
       let pubDate = art.publication_date || art.publicationDate || '';
       if (pubDate.includes('.')) pubDate = pubDate.replace(/\./g, '-');
