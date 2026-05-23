@@ -72,9 +72,9 @@ export default async function handler(req, res) {
         <body>
           <h1>RePEc Archive: snp</h1>
           <ul>
-            <li><a href="/repec/snp/snparch.rdf">snparch.rdf</a> (Archive Template)</li>
-            <li><a href="/repec/snp/snpseri.rdf">snpseri.rdf</a> (Series Template)</li>
-            <li><a href="/repec/snp/journl/">journl/</a> (Subdirectory for Articles)</li>
+            <li><a href="snparch.rdf">snparch.rdf</a> (Archive Template)</li>
+            <li><a href="snpseri.rdf">snpseri.rdf</a> (Series Template)</li>
+            <li><a href="journl/">journl/</a> (Subdirectory for Articles)</li>
           </ul>
         </body>
         </html>
@@ -112,7 +112,7 @@ Handle: RePEc:snp:journl
     // Switch links to .redif so RePEc parses them as UTF-8 (Unicode) and resolves Windows-1252 character warnings!
     if (file === 'snp/journl' || file === 'snp/journl/' || file === 'snp/journl/index.html') {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      let links = (articles || []).map(art => `<li><a href="/repec/snp/journl/${art.id}.redif">${art.id}.redif</a></li>`).join('');
+      let links = (articles || []).map(art => `<li><a href="${art.id}.redif">${art.id}.redif</a></li>`).join('');
       return res.status(200).send(`
         <html>
         <body>
