@@ -732,9 +732,9 @@ function getPublicFooter() {
           <div>
              <h4 class="font-bold text-sm uppercase tracking-widest text-accent mb-8">Contact</h4>
              <p class="text-sm text-gray-400 leading-relaxed">
-                ${siteInfo.address}<br>
-                Email: <a href="mailto:${siteInfo.email}" class="hover:text-white underline decoration-accent/30">${siteInfo.email}</a><br>
-                Tel: <a href="tel:${siteInfo.phone}" class="hover:text-white underline decoration-accent/30">${siteInfo.phone}</a><br><br>
+                1250 Avenue of the Americas, New York, NY 10020, USA<br>
+                Email: <a href="mailto:editor@synoptic-journal.org" class="hover:text-white underline decoration-accent/30">editor@synoptic-journal.org</a><br>
+                Tel: <a href="tel:+1(212)555-0198" class="hover:text-white underline decoration-accent/30">+1 (212) 555-0198</a><br><br>
                 <span class="text-[10px] font-bold text-accent">ISSN: ${siteInfo.issn}</span>
              </p>
           </div>
