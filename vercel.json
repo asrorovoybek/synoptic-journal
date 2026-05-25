@@ -45,6 +45,10 @@
       "destination": "/api/repec?file=snp/"
     },
     {
+      "source": "/oai",
+      "destination": "/api/oai"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
