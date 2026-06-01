@@ -304,6 +304,8 @@ function getPublicHeader() {
 
 function renderPublic(path, params) {
   if (path === '/' || path === '/home') {
+    const latestIssue = issues[0] || {};
+    const latestIssueArticles = latestIssue.id ? articles.filter(a => a.issueId === latestIssue.id) : [];
     app.innerHTML = `${getPublicHeader()}
       <main class="animate-fade-in">
         <section class="relative py-20 md:py-24 overflow-hidden bg-slate-950/30 text-white">
@@ -326,9 +328,12 @@ function renderPublic(path, params) {
         
         <section class="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-3 gap-20">
            <div class="lg:col-span-2 space-y-12">
-              <h2 class="text-4xl font-serif font-bold flex items-center gap-4 text-primary">Latest Published Research</h2>
+              <h2 class="text-4xl font-serif font-bold flex flex-wrap items-center gap-4 text-primary">
+                 Current Issue: Vol. ${latestIssue.volume || '1'}, No. ${latestIssue.issueNumber || '1'}
+                 <span class="text-xs font-sans font-bold text-accent px-3.5 py-1 bg-accent/15 rounded-full uppercase tracking-widest">${latestIssue.month || ''} ${latestIssue.year || ''}</span>
+              </h2>
               <div class="grid gap-8">
-                ${articles.slice(0, 5).map(art => `
+                ${latestIssueArticles.map(art => `
                   <div class="card-scientific group cursor-pointer" onclick="window.msje_navigate('/article?id=${art.id}')">
                      <span class="academic-label">${art.type}</span>
                      <h3 class="text-3xl font-serif font-bold mt-2 group-hover:text-accent transition-colors leading-snug">${art.title}</h3>
@@ -339,8 +344,11 @@ function renderPublic(path, params) {
                      </div>
                   </div>
                 `).join('')}
-                ${articles.length > 5 ? `
-                  <button onclick="window.msje_navigate('/archive')" class="w-full py-6 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 font-bold hover:border-accent hover:text-accent transition-all uppercase tracking-widest text-xs">View all articles in Archive &rarr;</button>
+                ${latestIssueArticles.length === 0 ? `
+                  <p class="text-slate-400 font-medium py-8 text-center italic">No articles published in this issue yet.</p>
+                ` : ''}
+                ${articles.length > latestIssueArticles.length ? `
+                  <button onclick="window.msje_navigate('/archive')" class="w-full py-6 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 font-bold hover:border-accent hover:text-accent transition-all uppercase tracking-widest text-xs">View past issues in Archive &rarr;</button>
                 ` : ''}
               </div>
            </div>
