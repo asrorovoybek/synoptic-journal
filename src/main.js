@@ -36,26 +36,34 @@ async function loadData() {
     }
     
     if (ann) announcements = ann;
-    if (iss) issues = iss.map(i => {
-      const mapped = { ...i, issueNumber: i.issuenumber || i.issueNumber || i.issue_number };
-      delete mapped.issuenumber;
-      return mapped;
-    });
-    if (art) articles = art.map(a => {
-      let path = a.pdf_path || a.pdfPath;
-      if (path && !path.startsWith('http')) {
-        path = `${supabaseUrl}/storage/v1/object/public/pdfs/${path}`;
-      }
-      return { 
-        ...a, 
-        issueId: a.issue_id || a.issueId, 
-        firstPage: a.first_page || a.firstPage, 
-        lastPage: a.last_page || a.lastPage, 
-        publicationDate: a.publication_date || a.publicationDate, 
-        pdfPath: path, 
-        references: a.refs || a.references 
-      };
-    });
+    if (iss) {
+      issues = iss.map(i => {
+        const mapped = { ...i, issueNumber: i.issuenumber || i.issueNumber || i.issue_number };
+        delete mapped.issuenumber;
+        return mapped;
+      });
+      // Sort issues by year, volume, and issue number descending (latest first)
+      issues.sort((a, b) => b.year - a.year || b.volume - a.volume || b.issueNumber - a.issueNumber);
+    }
+    if (art) {
+      articles = art.map(a => {
+        let path = a.pdf_path || a.pdfPath;
+        if (path && !path.startsWith('http')) {
+          path = `${supabaseUrl}/storage/v1/object/public/pdfs/${path}`;
+        }
+        return { 
+          ...a, 
+          issueId: a.issue_id || a.issueId, 
+          firstPage: a.first_page || a.firstPage, 
+          lastPage: a.last_page || a.lastPage, 
+          publicationDate: a.publication_date || a.publicationDate, 
+          pdfPath: path, 
+          references: a.refs || a.references 
+        };
+      });
+      // Sort articles by ID (creation timestamp) descending so latest published research is shown first
+      articles.sort((a, b) => b.id.localeCompare(a.id));
+    }
     if (sub) submissions = sub.map(s => {
       let path = s.file_path || s.filePath;
       if (path && !path.startsWith('http')) {
