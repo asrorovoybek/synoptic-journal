@@ -49,6 +49,10 @@
       "destination": "/api/oai"
     },
     {
+      "source": "/article",
+      "destination": "/api/article"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
