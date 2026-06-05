@@ -11,7 +11,8 @@ export default async function handler(req, res) {
 
   // If no ID, just serve the normal index.html
   if (!id) {
-    const indexPath = path.join(process.cwd(), 'index.html');
+    let indexPath = path.join(process.cwd(), 'dist', 'index.html');
+    if (!fs.existsSync(indexPath)) indexPath = path.join(process.cwd(), 'index.html');
     const html = fs.readFileSync(indexPath, 'utf-8');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(200).send(html);
@@ -22,7 +23,8 @@ export default async function handler(req, res) {
     const { data: sInfo } = await supabase.from('site_info').select('*').single();
     
     if (!art) {
-      const indexPath = path.join(process.cwd(), 'index.html');
+      let indexPath = path.join(process.cwd(), 'dist', 'index.html');
+      if (!fs.existsSync(indexPath)) indexPath = path.join(process.cwd(), 'index.html');
       const html = fs.readFileSync(indexPath, 'utf-8');
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.status(200).send(html);
@@ -112,7 +114,8 @@ export default async function handler(req, res) {
     `;
 
     // Read index.html and inject
-    const indexPath = path.join(process.cwd(), 'index.html');
+    let indexPath = path.join(process.cwd(), 'dist', 'index.html');
+    if (!fs.existsSync(indexPath)) indexPath = path.join(process.cwd(), 'index.html');
     let html = fs.readFileSync(indexPath, 'utf-8');
     
     // Inject <meta> tags into <head>
@@ -126,7 +129,8 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Error generating article HTML:', error);
     // Fallback to normal index.html
-    const indexPath = path.join(process.cwd(), 'index.html');
+    let indexPath = path.join(process.cwd(), 'dist', 'index.html');
+    if (!fs.existsSync(indexPath)) indexPath = path.join(process.cwd(), 'index.html');
     const html = fs.readFileSync(indexPath, 'utf-8');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(200).send(html);
