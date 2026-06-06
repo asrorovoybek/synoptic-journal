@@ -168,20 +168,7 @@ Handle: RePEc:snp:journl
         rdf += `File-Format: Application/pdf\n`;
       }
       
-      // Add References if any
-      let refsArray = [];
-      const artRefs = art.references || art.refs;
-      if (artRefs) {
-        if (typeof artRefs === 'string') {
-           refsArray = artRefs.split(/\r?\n/).filter(r => r.trim() !== '');
-        } else if (Array.isArray(artRefs)) {
-           refsArray = artRefs;
-        }
-        refsArray.forEach(ref => {
-          rdf += `Reference: ${cleanHomoglyphs(ref)}\n`;
-        });
-      }
-      
+
       rdf += `Handle: RePEc:snp:journl:${art.id}\n`;
 
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
